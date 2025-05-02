@@ -62,7 +62,8 @@ func (u *UserHandler) SignUp(ctx *gin.Context) {
 		return
 	}
 	if req.ConfirmPassword != req.Password {
-		ctx.String((http.StatusOK, "两次输入的密码不一致"))
+		ctx.String(http.StatusOK, "两次输入的密码不一致")
+		return
 	}
 	ctx.String(http.StatusOK, "注册成功")
 	fmt.Printf("%v", req)
