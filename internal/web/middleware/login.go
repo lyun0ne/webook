@@ -2,10 +2,12 @@ package middleware
 
 import (
 	"net/http"
+	"time"
+
+	"slices"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
-	"slices"
 )
 
 type LoginMiddlewareBuilder struct {
@@ -25,14 +27,31 @@ func (l *LoginMiddlewareBuilder) Build() gin.HandlerFunc {
 		if slices.Contains(l.paths, ctx.Request.URL.Path) {
 			return
 		}
-		// if ctx.Request.URL.Path == "/users/login" || ctx.Request.URL.Path == "/users/signup" {
-		// 	return
-		// }
 
 		sess := sessions.Default(ctx)
 		id := sess.Get("userId")
 		if id == nil {
 			ctx.AbortWithStatus(http.StatusUnauthorized)
+			return
+		}
+
+		updateTime := sess.Get("update_time")
+		sess.Set("userId", id)
+		sess.Options(sessions.Options{
+			MaxAge: 60 * 60,
+		})
+		now := time.Now().UnixMilli()
+		if updateTime == nil {
+			sess.Set("update_time", now)
+			sess.Save()
+			return
+		}
+
+		updateTimeval, _ := updateTime.(int64)
+
+		if now-updateTimeval > 60*1000 {
+			sess.Set("update_time", now)
+			sess.Save()
 			return
 		}
 	}

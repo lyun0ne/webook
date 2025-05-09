@@ -50,7 +50,7 @@ func initWebserver() *gin.Engine {
 		MaxAge: 12 * time.Hour,
 	}))
 
-	store, err := redis.NewStore(16, "tcp", "localhost:13326", "", "",
+	store, err := redis.NewStore(16, "tcp", "localhost:11326", "", "",
 		[]byte("I8AfIpPPkTNK8gkDb87Hv2lRdaLxu68r"),
 		[]byte("IQs5zlSIUSrkn4hgZv6r8gd7CdUE56mR"))
 
