@@ -33,8 +33,8 @@ func initWebserver() *gin.Engine {
 		AllowOrigins: []string{"http://localhost:3000"},
 		//不写AllowMethod 就是所有方法都允许
 		AllowMethods:  []string{"PUT", "PATCH", "POST"},
-		AllowHeaders:  []string{"Origin", "content-type"},
-		ExposeHeaders: []string{"Content-Length"},
+		AllowHeaders:  []string{"Origin", "content-type", "authorization"},
+		ExposeHeaders: []string{"Content-Length", "x-jwt-token"},
 		//是否允许带cookie一类的东西
 		AllowCredentials: true,
 		//通过一个方法允许origin是否允许
@@ -60,8 +60,13 @@ func initWebserver() *gin.Engine {
 
 	server.Use(sessions.Sessions("webookId", store))
 
+	// server.Use(middleware.
+	// 	NewLoginMiddlewareBuilder().
+	// 	IngorePaths("/users/login").
+	// 	IngorePaths("/users/signup").
+	// 	Build())
 	server.Use(middleware.
-		NewLoginMiddlewareBuilder().
+		NewLoginJWTMiddlewareBuilder().
 		IngorePaths("/users/login").
 		IngorePaths("/users/signup").
 		Build())
