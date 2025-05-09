@@ -6,7 +6,7 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/sessions"
-	"github.com/gin-contrib/sessions/cookie"
+	"github.com/gin-contrib/sessions/redis"
 	"github.com/gin-gonic/gin"
 	"github.com/lyun0ne/webook/internal/repository"
 	"github.com/lyun0ne/webook/internal/repository/dao"
@@ -50,7 +50,14 @@ func initWebserver() *gin.Engine {
 		MaxAge: 12 * time.Hour,
 	}))
 
-	store := cookie.NewStore([]byte("secret"))
+	store, err := redis.NewStore(16, "tcp", "localhost:13326", "", "",
+		[]byte("I8AfIpPPkTNK8gkDb87Hv2lRdaLxu68r"),
+		[]byte("IQs5zlSIUSrkn4hgZv6r8gd7CdUE56mR"))
+
+	if err != nil {
+		panic(err)
+	}
+
 	server.Use(sessions.Sessions("webookId", store))
 
 	server.Use(middleware.
