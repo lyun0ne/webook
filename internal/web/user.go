@@ -1,7 +1,9 @@
 package web
 
 import (
+	"log"
 	"net/http"
+	"time"
 
 	regexp "github.com/dlclark/regexp2"
 	"github.com/gin-contrib/sessions"
@@ -21,6 +23,12 @@ type UserHandler struct {
 	svc         *service.UserService
 	emailExp    *regexp.Regexp
 	passwordExp *regexp.Regexp
+}
+
+type UserClaims struct {
+	jwt.RegisteredClaims
+
+	Uid int64
 }
 
 func NewUserHandler(svc *service.UserService) *UserHandler {
@@ -100,7 +108,7 @@ func (u *UserHandler) LoginJWT(ctx *gin.Context) {
 	if err := ctx.Bind(&req); err != nil {
 		return
 	}
-	_, err := u.svc.Login(ctx, domain.User{
+	user, err := u.svc.Login(ctx, domain.User{
 		Email:    req.Email,
 		Password: req.Password,
 	})
@@ -112,7 +120,13 @@ func (u *UserHandler) LoginJWT(ctx *gin.Context) {
 		ctx.String(http.StatusOK, "系统错误")
 		return
 	}
-	token := jwt.New(jwt.SigningMethodHS512)
+	claims := UserClaims{
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Minute)),
+		},
+		Uid: user.Id,
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS512, claims)
 	tokenStr, err := token.SignedString([]byte("rK5VZ3TsyVneRukCDYsPnBwTWzuSYyA7"))
 	if err != nil {
 		ctx.String(http.StatusInternalServerError, "系统错误")
@@ -160,5 +174,17 @@ func (u *UserHandler) Login(ctx *gin.Context) {
 func (u *UserHandler) Edit(ctx *gin.Context) {}
 
 func (u *UserHandler) Profile(ctx *gin.Context) {
+	c, ok := ctx.Get("userId")
+	if !ok {
+		ctx.String(http.StatusOK, "系统错误")
+		return
+	}
+	userId, ok := c.(int64)
+	if !ok {
+		ctx.String(http.StatusOK, "系统错误")
+		return
+	}
+	log.Println(userId)
+
 	ctx.String(http.StatusOK, "这是你的profile")
 }

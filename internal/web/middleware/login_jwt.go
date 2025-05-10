@@ -3,10 +3,13 @@ package middleware
 import (
 	"net/http"
 	"slices"
+	"time"
+
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
-	"strings"
+	"github.com/lyun0ne/webook/internal/web"
 )
 
 // JWT登录校验
@@ -39,7 +42,8 @@ func (l *LoginJWTMiddlewareBuilder) Build() gin.HandlerFunc {
 			return
 		}
 		tokenStr := segs[1]
-		token, err := jwt.Parse(tokenStr, func(t *jwt.Token) (any, error) {
+		claims := &web.UserClaims{}
+		token, err := jwt.ParseWithClaims(tokenStr, claims, func(t *jwt.Token) (any, error) {
 			return []byte("rK5VZ3TsyVneRukCDYsPnBwTWzuSYyA7"), nil
 		})
 		if err != nil {
@@ -50,6 +54,17 @@ func (l *LoginJWTMiddlewareBuilder) Build() gin.HandlerFunc {
 			ctx.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
+		now := time.Now()
+		if claims.ExpiresAt.Sub(now) < time.Second*50 {
+			claims.ExpiresAt = jwt.NewNumericDate(time.Now().Add(time.Minute))
+			tokenStr, err = token.SignedString([]byte("rK5VZ3TsyVneRukCDYsPnBwTWzuSYyA7"))
+			if err != nil {
+				// 记录日志
+			}
+			ctx.Header("x-jwt-token, tokenStr")
+		}
+
+		ctx.Set("userId", claims.Uid)
 
 	}
 }
