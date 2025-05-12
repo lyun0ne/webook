@@ -20,7 +20,7 @@ type LoginJWTMiddlewareBuilder struct {
 func NewLoginJWTMiddlewareBuilder() *LoginJWTMiddlewareBuilder {
 	return &LoginJWTMiddlewareBuilder{}
 }
-func (l *LoginJWTMiddlewareBuilder) IngorePaths(path string) *LoginJWTMiddlewareBuilder {
+func (l *LoginJWTMiddlewareBuilder) IgnorePaths(path string) *LoginJWTMiddlewareBuilder {
 	l.paths = append(l.paths, path)
 	return l
 }

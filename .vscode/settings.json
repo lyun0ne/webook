@@ -1,0 +1,18 @@
+{
+    "cSpell.words": [
+        "ginx",
+        "GOARCH",
+        "gonic",
+        "gorm",
+        "lyun",
+        "lyunone",
+        "signup",
+        "Srkn",
+        "webook"
+    ],
+    "gopls": {
+        "buildFlags": [
+            "-tags=k8s"
+        ]
+    }
+}

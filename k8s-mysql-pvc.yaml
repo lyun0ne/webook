@@ -1,0 +1,14 @@
+# persistentVOlumeClaim
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: webook-mysql-claim
+spec:
+  #可以随便（storageCLassName）
+  storageClassName: manual
+  accessModes:
+    # 三种模式 ReadWriteOnce, ReadOnlyMany, ReadWriteMany
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
