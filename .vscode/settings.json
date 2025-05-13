@@ -14,5 +14,6 @@
         "buildFlags": [
             "-tags=k8s"
         ]
-    }
+    },
+    "makefile.configureOnOpen": false
 }
